@@ -31,9 +31,13 @@
   
 Предположим, что вы локально внесли изменения и хотите внести их в основной репозиторий (т.е. выполнить merge)  
 Для этого:  
+`git commit -a -m "Your message"` (или git add . && git commit -m "Your message")  
 `git checkout master` (переключаемся на master)  
 `git pull` (обновляем наш локальный репозиторий)  
 `git merge <branchname>`  
+`git checkout <branchname>` (переключаемся обратно на свою ветвь)  
+
+Здесь нет пункта про merge-conflicts, надеюсь их не будет, но прочитать про это можно [здесь](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging), глава Basic Merge Conflicts, [на русском](https://git-scm.com/book/ru/v2/%D0%92%D0%B5%D1%82%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B2-Git-%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D1%8B-%D0%B2%D0%B5%D1%82%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8-%D1%81%D0%BB%D0%B8%D1%8F%D0%BD%D0%B8%D1%8F) 
   
 Подробнее [здесь](https://www.git-tower.com/learn/git/faq/git-merge-branch/)
 
