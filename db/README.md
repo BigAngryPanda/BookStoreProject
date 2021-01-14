@@ -13,3 +13,5 @@
 База данных готова.  
 
 Запросы к бд и их описание есть в файле db/queries  
+
+Также смотри [это](https://likegeeks.com/mysql-on-linux-beginners-tutorial/)
