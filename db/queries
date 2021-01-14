@@ -1,0 +1,193 @@
+SQL гайд
+книги, авторы, издатели и несколько заказаов со всеми связями я добавил, поэтому можно ничего из части книг вообще не трогать
+думаю, реализовывать админ страницы с добавлением новых книг и т.д нет смысла, поэтому можно реализовать только создание заказа и вывод информации о нем
+создание и вывод инфы описаны в самом низу, но если понадобится добавлять что-то еще - то здесь по идее описано все
+символ ` где-то можно убирать, а где то нет, так что можно попробовать его убрать, а если выдаст ошибку, то добавить опять
+
+
+// добавить автора (author)
+// MiddleName - необязателен (в запрос можно не включать)
+
+INSERT INTO `author` (
+`FirstName`,
+`LastName`,
+`MiddleName`
+)
+VALUES (
+'Лев',
+'Толстой',
+NULL
+);
+
+
+// добавление издателя (publisher)
+
+INSERT INTO `publisher` (
+`Title`
+)
+VALUES (
+'Космос'
+);
+
+
+// добавление книги (book)
+// для добавления книги, нужно сначала добавить в бд автора и в запросе указать ID автора (AuthorID)
+// Year подразумевает под собой год издания книги, а не когда ее написали
+// необязательные параметры - PriceAudio и PriceElectronic (значит нет такой версии книги, по идее бумажная есть всегда)
+
+INSERT INTO `book` (
+`Title` ,
+`AuthorID` ,
+`Description` ,
+`Year` ,
+`Quantity` ,
+`Price` ,
+`PriceAudio` ,
+`PriceElectronic`
+)
+VALUES (
+'Противостояние',
+'3',
+'Америка превратилась в ад. Из секретной лаборатории вырвался на свободу опаснейший вирус. Умерли сотни тысяч, миллионы ни в чем не повинных людей...',
+'2021',
+'18',
+'600',
+'559',
+'319'
+);
+
+// вывод списка всех книг 
+SELECT * FROM `book`
+// вывод книг с опредленным автором (ID)
+SELECT * FROM `book` WHERE `AuthorID` = '3'
+// вывод книг с опредленным автором (ID) по возрастанию цены бумажной версии книги
+SELECT * FROM `book` WHERE `AuthorID` = '3' ORDER BY `Price`
+// вывод краткой информации по книге, с заменой AuthorID на LastName автора
+SELECT `book`.`Title`, `author`.`LastName` AS AuthorName, `book`.`Year`, `book`.`Quantity`, `book`.`Price` FROM `book` INNER JOIN `author` ON `book`.`AuthorID` = `author`.`ID`
+// подсчет всех книг
+SELECT COUNT(`ID`) FROM `book`
+// вывод минимальной цены из всех книг
+SELECT MIN(`Price`) FROM `book`
+// вывод всех книг автора по его фамилии
+SELECT * FROM `book` WHERE `AuthorID` = (SELECT `ID` FROM `author` WHERE `LastName` = 'Кинг')
+
+
+// добавление издателей к книге (book_publisher)
+// дальше нужно связать книгу и издателей (book) и (publisher)
+// в BookID вставляем ID книги (book), а в PublisherID - ID издателя (publisher)
+
+INSERT INTO `book_publisher` (
+`BookID` ,
+`PublisherID`
+)
+VALUES (
+'10',
+'4'
+);
+
+
+// добавление статуса заказа (order_status)
+// я добавил некоторые константные значения, но можно добавить еще
+
+INSERT INTO `order_status` (
+`Status`
+)
+VALUES (
+'Не доставлен'
+);
+
+
+// добавление типа книги (book_type)
+// тоже самое, что и с предыдущем запросом
+
+INSERT INTO `book_type` (
+`Type`
+)
+VALUES (
+'Мягкий переплет'
+);
+
+
+// создание заказа (order)
+// по умолчанию OrderStatusID выдается 1 - 'Принят в обработку'
+// имя, фамилия, email, телефон, адрес идут прямо из формы (GET или POST запросом)
+// также, в запросе будут все книги, которые заказал человек, исходя из них будет считаться цена заказа
+// дату заказа нужно брать из текущего времени и преобразовывать ее в формат SQL
+// эжидаемую дату доставки можно делать, просто прибавляя к текущей какое-то константное время
+
+INSERT INTO `order` (
+`CustomerFirstName` ,
+`CustomerLastName` ,
+`Email` ,
+`Phone` ,
+`Address` ,
+`Cost` ,
+`DateOfOrder` ,
+`DateOfDelivery` ,
+`OrderStatusID`
+)
+VALUES (
+'Павел',
+'Павлов',
+'pav_pavl@mail.ru',
+'+79991234567',
+'г. Санкт Петербург, ул Пушкина, д. 29, кв. 228',
+'1337',
+'2021-01-14 09:21:37',
+'2021-01-15 12:00:00',
+'1'
+);
+
+
+// добавление деталей заказа к заказу (order_detail)
+// здесь нужно для каждой уникальной книги добавлять новую строчку к таблице
+// OrderID - ID заказа, BookID - ID книги, Cost - цена книг(и) на момент покупки (цена 1 книги * количество книг), BookTypeID - тип книги (бумага - 1, электронная - 2, аудио - 3)
+
+INSERT INTO `order_detail` (
+`OrderID` ,
+`BookID` ,
+`Quantity` ,
+`Cost` ,
+`BookTypeID`
+)
+VALUES (
+'4',
+'5',
+'1',
+'158',
+'1'
+);
+
+
+
+
+
+// процесс создания заказа
+// в запросе передается вся инфа о клиенте и список всех книг
+
+// считаем цену заказа, считаем время отправления и доставки, создаем заказ как в примере выше
+INSERT INTO `order` (...
+
+// получаем ID заказа 
+SELECT `ID` FROM `order` ORDER BY `ID` DESC LIMIT 1
+
+// для каждой книги делаем запрос в бд с ID заказа, который получили в предыдущем шаге
+INSERT INTO `order_detail` (`OrderID`, `BookID`, `Quantity`, `Cost`, `BookTypeID`) VALUES ('4', '8', '1', '228', '1');
+
+
+
+// вывод информации о заказе, по ID заказа (самый последний параметр)
+// в OrderStatus будет строка со статусом заказа, а не int
+SELECT `order`.`CustomerFirstName`, `order`.`CustomerLastName`, `order`.`Email`, `order`.`Phone`, `order`.`Address`, `order`.`Cost`, `order`.`DateOfOrder`, `order`.`DateOfDelivery`, `order_status`.`Status` AS OrderStatus
+FROM `order` INNER JOIN `order_status` ON `order`.`OrderStatusID` = `order_status`.`ID` WHERE `order`.`ID` = 4
+
+// вывод всех книг, которые есть в заказе, по ID заказа
+SELECT `book`.`Title`, `order_detail`.`Quantity`, `author`.`LastName`, `book`.`Year`, `order_detail`.`Cost` FROM `order_detail` 
+INNER JOIN `book` ON `book`.`ID` = `order_detail`.`BookID`
+INNER JOIN `author` ON `author`.`ID` = `book`.`AuthorID`
+WHERE `order_detail`.`OrderID` = 4
+
+
+// изменение статуса заказа по ID заказа
+UPDATE `order` SET `OrderStatusID` = 2 WHERE `ID` = 4
+

@@ -63,3 +63,19 @@ misc (для всего остального)
   
 Может быть так, что в процессе работы вам потребуется создавать новые ветви в своей основной  
 Как создать свою ветку: `git checkout -b <yournewbranch>` [Подробнее](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
+
+## Установка база данных
+я тестировал на Debian 10
+устанавливал mysql по [гайду](https://losst.ru/ustanovka-mysql-v-debian-10)
+далее логинимся через root аккаунт
+`mysql -u root -p`
+создаем базу
+`create database store;`
+выбираем ее
+`use store;`
+экспортируем бд через команду (путь до sql файла свой)
+`source /home/test/store.sql;`
+
+бд готова.
+
+Запросы к бд и их описание есть в файле db/queries
