@@ -15,3 +15,7 @@
 Запросы к бд и их описание есть в файле db/queries  
 
 Также смотри [это](https://likegeeks.com/mysql-on-linux-beginners-tutorial/)
+
+## Настройка пользователя
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_new_password';  
+См. [тут](https://stackoverflow.com/a/43659857)
